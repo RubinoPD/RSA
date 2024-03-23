@@ -70,7 +70,7 @@ class RSA
                         Console.WriteLine("Enter filename to decrypt from:");
                         string fileName = Console.ReadLine();
                         string encryptedFromFile = ReadFromFile(fileName);
-                        if (encryptedFromFile != null)
+                        if (encryptedFromFile != null && encryptedFromFile != "")
                         {
                             string decryptedText = Decrypt(encryptedFromFile, privateKey);
                             Console.WriteLine("Decrypted Text: " + decryptedText);
@@ -148,7 +148,7 @@ class RSA
     {
         BigInteger n = privateKey[0];
         BigInteger d = privateKey[1];
-        string[] encryptedText = encryptedInput.Split(' ');
+        string[] encryptedText = encryptedInput.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
         char[] decryptedText = new char[encryptedText.Length];
 
         for (int i = 0; i < encryptedText.Length; i++)
