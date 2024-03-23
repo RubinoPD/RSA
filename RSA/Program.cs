@@ -1,21 +1,22 @@
 ﻿using System;
+using System.Numerics;
 
 class RSA
 {
     static void Main(string[] args)
     {
-        int p = GenerateRandomPrime(50, 100); // First prime number
-        int q = GenerateRandomPrime(50, 100); // Second prime number
-        int e = 17; // Public exponent
+        BigInteger p = GenerateRandomPrime(100, 1000); // First prime number
+        BigInteger q = GenerateRandomPrime(100, 1000); // Second prime number
+        BigInteger e = 17; // Public exponent
 
         // Generate keys
-        int n = p * q;
-        int phi = (p - 1) * (q - 1);
-        int d = CalculatePrivateKey(phi, e);
+        BigInteger n = p * q;
+        BigInteger phi = (p - 1) * (q - 1);
+        BigInteger d = CalculatePrivateKey(phi, e);
 
         // Store public and private keys
-        int[] publicKey = { n, e };
-        int[] privateKey = { n, d };
+        BigInteger[] publicKey = { n, e };
+        BigInteger[] privateKey = { n, d };
 
         while (true)
         {
@@ -31,7 +32,7 @@ class RSA
                 case "1":
                     Console.WriteLine("Enter text to encrypt:");
                     string plainText = Console.ReadLine();
-                    int[] encryptedText = Encrypt(plainText, publicKey);
+                    BigInteger[] encryptedText = Encrypt(plainText, publicKey);
                     Console.WriteLine("Encrypted Text:");
                     foreach (var item in encryptedText)
                     {
@@ -55,7 +56,7 @@ class RSA
         }
     }
 
-    static int CalculatePrivateKey(int phi, int e)
+    static BigInteger CalculatePrivateKey(BigInteger phi, BigInteger e)
     {
         int d = 0;
         while (true)
@@ -69,46 +70,46 @@ class RSA
         return d;
     }
 
-    static int[] Encrypt(string plainText, int[] publicKey)
+    static BigInteger[] Encrypt(string plainText, BigInteger[] publicKey)
     {
-        int n = publicKey[0];
-        int e = publicKey[1];
-        int[] encryptedText = new int[plainText.Length];
+        BigInteger n = publicKey[0];
+        BigInteger e = publicKey[1];
+        BigInteger[] encryptedText = new BigInteger[plainText.Length];
 
         for (int i = 0; i < plainText.Length; i++)
         {
-            int charValue = plainText[i];
-            int encryptedValue = ModPow(charValue, e, n);
+            BigInteger charValue = plainText[i];
+            BigInteger encryptedValue = ModPow(charValue, e, n);
             encryptedText[i] = encryptedValue;
         }
 
         return encryptedText;
     }
 
-    static string Decrypt(string encryptedInput, int[] privateKey)
+    static string Decrypt(string encryptedInput, BigInteger[] privateKey)
     {
-        int n = privateKey[0];
-        int d = privateKey[1];
+        BigInteger n = privateKey[0];
+        BigInteger d = privateKey[1];
         string[] encryptedText = encryptedInput.Split(' ');
         char[] decryptedText = new char[encryptedText.Length];
 
         for (int i = 0; i < encryptedText.Length; i++)
         {
             int encryptedValue = int.Parse(encryptedText[i]);
-            int decryptedValue = ModPow(encryptedValue, d, n);
+            BigInteger decryptedValue = ModPow(encryptedValue, d, n);
             decryptedText[i] = (char)decryptedValue;
         }
 
         return new string(decryptedText);
     }
 
-    static int ModPow(int value, int exponent, int modulus)
+    static BigInteger ModPow(BigInteger value, BigInteger exponent, BigInteger modulus)
     {
         if (exponent == 0)
             return 1;
         if (exponent % 2 == 0)
         {
-            int half = ModPow(value, exponent / 2, modulus);
+            BigInteger half = ModPow(value, exponent / 2, modulus);
             return (half * half) % modulus;
         }
         else
@@ -149,7 +150,7 @@ class RSA
         return primes;
     }
 
-    static int GenerateRandomPrime(int min, int max)
+    static BigInteger GenerateRandomPrime(int min, int max)
     {
         Random rand = new Random();
         List<int> primesInRange = GetPrimesInRange(min, max);
