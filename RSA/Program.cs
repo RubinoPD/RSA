@@ -20,6 +20,8 @@ class RSA
 
         while (true)
         {
+
+            Console.WriteLine("RSA Encryption/decryption system\n");
             Console.WriteLine("Choose an option:");
             Console.WriteLine("1. Encrypt");
             Console.WriteLine("2. Decrypt");
@@ -39,12 +41,41 @@ class RSA
                         Console.Write(item + " ");
                     }
                     Console.WriteLine();
+
+                    Console.WriteLine("Do you want to save encrypted text to a file? (yes/no)");
+                    string saveOption = Console.ReadLine().ToLower();
+                    if (saveOption == "yes")
+                    {
+                        Console.WriteLine("Enter file name to save:");
+                        string fileName = Console.ReadLine();
+                        SaveToFile(fileName, encryptedText);
+                        Console.WriteLine("Encrypted text saved to file: " + fileName);
+                    }
                     break;
                 case "2":
-                    Console.WriteLine("Enter text to decrypt (space-separated numbers):");
-                    string encryptedInput = Console.ReadLine();
-                    string decryptedText = Decrypt(encryptedInput, privateKey);
-                    Console.WriteLine("Decrypted Text: " + decryptedText);
+                    Console.WriteLine("Choose decryption source:");
+                    Console.WriteLine("1. Decrypt from input");
+                    Console.WriteLine("2. Decrypt from file");
+                    string decryptChoice = Console.ReadLine();
+
+                    if (decryptChoice == "1")
+                    {
+                        Console.WriteLine("Enter text to decrypt (space-separated numbers):");
+                        string encryptedInput = Console.ReadLine();
+                        string decryptedText = Decrypt(encryptedInput, privateKey);
+                        Console.WriteLine("Decrypted Text: " + decryptedText);
+                    }
+                    else if (decryptChoice == "2")
+                    {
+                        Console.WriteLine("Enter filename to decrypt from:");
+                        string fileName = Console.ReadLine();
+                        string encryptedFromFile = ReadFromFile(fileName);
+                        if (encryptedFromFile != null)
+                        {
+                            string decryptedText = Decrypt(encryptedFromFile, privateKey);
+                            Console.WriteLine("Decrypted Text: " + decryptedText);
+                        }
+                    }
                     break;
                 case "3":
                     Environment.Exit(0);
@@ -53,6 +84,33 @@ class RSA
                     Console.WriteLine("Invalid choice. Please enter 1, 2, or 3.");
                     break;
             }
+        }
+    }
+
+    static void SaveToFile(string fileName, BigInteger[] encryptedText)
+    {
+        using (StreamWriter writer = new StreamWriter(fileName))
+        {
+            foreach (var item in encryptedText)
+            {
+                writer.Write(item + " ");
+            }
+        }
+    }
+
+    static string ReadFromFile(string fileName)
+    {
+        try
+        {
+            using (StreamReader reader = new StreamReader(fileName))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine("Error reading from file: " + ex.Message);
+            return null;
         }
     }
 
@@ -95,7 +153,13 @@ class RSA
 
         for (int i = 0; i < encryptedText.Length; i++)
         {
-            int encryptedValue = int.Parse(encryptedText[i]);
+            int encryptedValue;
+            if (!int.TryParse(encryptedText[i], out encryptedValue))
+            {
+                Console.WriteLine("Invalid input format. Please provide space-separated numbers.");
+                return "";
+            }
+
             BigInteger decryptedValue = ModPow(encryptedValue, d, n);
             decryptedText[i] = (char)decryptedValue;
         }
@@ -156,6 +220,8 @@ class RSA
         List<int> primesInRange = GetPrimesInRange(min, max);
         return primesInRange[rand.Next(primesInRange.Count)];
     }
+
+    
 }
 
 
